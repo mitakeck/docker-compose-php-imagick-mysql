@@ -3,8 +3,8 @@
 ## Env
 
 - CentOS
-- Apache
-- PHP 7.1
+- Apache 2.4.6
+- PHP 7.1.8
 - MySQL 5.7
 
 
