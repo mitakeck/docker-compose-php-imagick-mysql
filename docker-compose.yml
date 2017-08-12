@@ -6,9 +6,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: "root"
   php:
     build: ./image/php7-imagick-httpd/
+    tty: true # 起動し続ける
     ports:
       - "8080:80"
     volumes:
