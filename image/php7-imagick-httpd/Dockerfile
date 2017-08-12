@@ -12,7 +12,6 @@ RUN yum install -y epel-release && \
 
 # install httpd
 RUN yum install -y httpd
-ADD ./index.php /var/www/html/
 
 # install imagick
 RUN yum --enablerepo=remi install -y ImageMagick7 ImageMagick7-devel 
