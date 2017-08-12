@@ -12,6 +12,9 @@ RUN yum install -y epel-release && \
 
 # install httpd
 RUN yum install -y httpd
+RUN echo "<Directory /var/www/html>" >> /etc/httpd/conf/httpd.conf
+RUN echo "AllowOverride All" >> /etc/httpd/conf/httpd.conf
+RUN echo "</Directory>" >> /etc/httpd/conf/httpd.conf
 
 # install imagick
 RUN yum --enablerepo=remi install -y ImageMagick7 ImageMagick7-devel 
