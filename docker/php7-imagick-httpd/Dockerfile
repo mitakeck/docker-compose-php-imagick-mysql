@@ -19,7 +19,7 @@ RUN yum install -y gcc gcc-cpp gcc-c++ cpp make re2c icu libicu-devel
 RUN pecl channel-update pecl.php.net
 RUN pecl install imagick
 RUN echo "extension=imagick.so" >> /etc/php.ini
-RUN echo "pdo_mysql.default_socket=/tmp/myql.sock" >> /etc/php.ini
+RUN echo "pdo_mysql.default_socket=/var/run/mysqld/mysqld.sock" >> /etc/php.ini
 
 # install composer
 RUN curl -sS https://getcomposer.org/installer | php
