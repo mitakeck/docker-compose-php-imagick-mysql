@@ -11,22 +11,22 @@ RUN yum install -y epel-release && \
     yum clean all
 
 # install httpd
-RUN yum install -y httpd
-RUN echo "<Directory /var/www/html>" >> /etc/httpd/conf/httpd.conf
-RUN echo "AllowOverride All" >> /etc/httpd/conf/httpd.conf
-RUN echo "</Directory>" >> /etc/httpd/conf/httpd.conf
+RUN yum install -y httpd && \
+    echo "<Directory /var/www/html>" >> /etc/httpd/conf/httpd.conf && \
+    echo "AllowOverride All" >> /etc/httpd/conf/httpd.conf && \
+    echo "</Directory>" >> /etc/httpd/conf/httpd.conf
 
 # install imagick
-RUN yum --enablerepo=remi install -y ImageMagick7 ImageMagick7-devel 
-RUN yum install -y gcc gcc-cpp gcc-c++ cpp make re2c icu libicu-devel
-RUN pecl channel-update pecl.php.net
-RUN pecl install imagick
-RUN echo "extension=imagick.so" >> /etc/php.ini
-RUN echo "pdo_mysql.default_socket=/var/run/mysqld/mysqld.sock" >> /etc/php.ini
+RUN yum --enablerepo=remi install -y ImageMagick7 ImageMagick7-devel && \
+    yum install -y gcc gcc-cpp gcc-c++ cpp make re2c icu libicu-devel && \
+    pecl channel-update pecl.php.net && \
+    pecl install imagick && \
+    echo "extension=imagick.so" >> /etc/php.ini && \
+    echo "pdo_mysql.default_socket=/var/run/mysqld/mysqld.sock" >> /etc/php.ini
 
 # install composer
-RUN curl -sS https://getcomposer.org/installer | php
-RUN mv composer.phar /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php && \
+    mv composer.phar /usr/bin/composer
 
 EXPOSE 80
 CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
