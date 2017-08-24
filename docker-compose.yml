@@ -15,7 +15,7 @@ services:
     build: ./docker/php7-imagick-httpd/
     tty: true
     ports:
-      - "8080:80"
+      - "10080:80"
     volumes:
       - ./htdoc:/var/www/html
     links:
