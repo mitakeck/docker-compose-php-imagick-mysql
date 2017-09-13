@@ -15,8 +15,28 @@
 
 ## Setup
 
+## build docker container
+
 ```
+$ docker-compose build
 $ docker-compose up -d 
 ```
 
-open `http://localhost:10080`
+### network configure
+
+```
+$ vim /etc/hosts
+127.0.0.1 web.local
+127.0.0.1 mysql.local
+```
+
+open `http://web.local`
+
+
+## Memo
+
+### CONNECT FROM A CONTAINER TO A SERVICE ON THE HOST
+
+`docker.for.mac.localhost`
+
+[https://docs.docker.com/docker-for-mac/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host](https://docs.docker.com/docker-for-mac/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host)

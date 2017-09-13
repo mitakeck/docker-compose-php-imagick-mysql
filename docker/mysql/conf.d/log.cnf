@@ -5,5 +5,5 @@ general_log_file=/var/log/mysql/query.log
 slow_query_log=1
 slow_query_log_file=/var/log/mysql/slow-query.log
 long_query_time=1
-# log-queries-not-using-indexes
-# log-error=/var/log/mysql/error.log
+log-queries-not-using-indexes
+log-error=/var/log/mysql/error.log
