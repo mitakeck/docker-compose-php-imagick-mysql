@@ -6,7 +6,7 @@
 - Apache 2.4.6
 - PHP 7.1.8
 - MySQL 5.7
-
+- Redis 4.0.1 (latest)
 
 ## Deps
 
@@ -28,6 +28,7 @@ $ docker-compose up -d
 $ vim /etc/hosts
 127.0.0.1 web.local
 127.0.0.1 mysql.local
+127.0.0.1 redis.local
 ```
 
 open `http://web.local`

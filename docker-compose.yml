@@ -7,6 +7,14 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+  redis:
+    container_name: "redis"
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    tty: true
+    environment:
+      - VIRTUAL_HOST=redis.local
   mysql:
     container_name: "mysql"
     build: ./docker/mysql/
@@ -26,5 +34,6 @@ services:
       - ./htdoc:/var/www/html
     links:
       - mysql
+      - redis
     environment:
       - VIRTUAL_HOST=web.local
