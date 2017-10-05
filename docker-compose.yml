@@ -31,7 +31,7 @@ services:
     build: ./docker/php7-imagick-httpd/
     tty: true
     volumes:
-      - ./htdoc:/var/www/html
+      - ./htdoc:/home/site/wwwroot
     links:
       - mysql
       - redis

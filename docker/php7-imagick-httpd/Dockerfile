@@ -1,35 +1,101 @@
-FROM centos
+FROM php:7.0.6-apache
 MAINTAINER mitake_ck <mitake.ck@gmail.com>
 
-# common utils
-RUN yum update && yum install -y wget grep git ssh bash
+COPY apache2.conf /bin/
+COPY init_container.sh /bin/
+# COPY hostingstart.html /home/site/wwwroot/hostingstart.html
 
-# install php7
-RUN yum install -y epel-release && \
-    rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm && \
-    yum -y install --enablerepo=remi-php71 php php-fpm php-mcrypt php-cli php-common php-devel php-gd php-mbstring php-mysqlnd php-opcache php-pdo php-pear php-pecl-apcu php-pecl-zip php-process php-xml php-intl php-redis && \
-    yum clean all
+RUN a2enmod rewrite expires include deflate
 
-# install httpd
-RUN yum install -y httpd && \
-    echo "<Directory /var/www/html>" >> /etc/httpd/conf/httpd.conf && \
-    echo "AllowOverride All" >> /etc/httpd/conf/httpd.conf && \
-    echo "</Directory>" >> /etc/httpd/conf/httpd.conf
+# install the PHP extensions we need
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+         libpng12-dev \
+         libjpeg-dev \
+         libpq-dev \
+         libmcrypt-dev \
+         libldap2-dev \
+         libldb-dev \
+         libicu-dev \
+         libgmp-dev \
+         libmagickwand-dev \
+         openssh-server vim curl wget tcptraceroute \
+    && chmod 755 /bin/init_container.sh \
+    && echo "root:Docker!" | chpasswd \
+    && echo "cd /home" >> /etc/bash.bashrc \
+    && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
+    && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
+    && ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h \
+    && rm -rf /var/lib/apt/lists/* \
+    && pecl install imagick-beta \
+    && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
+    && docker-php-ext-install gd \
+         mysqli \
+         opcache \
+         pdo \
+         pdo_mysql \
+         pdo_pgsql \
+         pgsql \
+         ldap \
+         intl \
+         mcrypt \
+         gmp \
+         zip \
+         bcmath \
+         mbstring \
+         pcntl \
+    && docker-php-ext-enable imagick
 
-# install imagick
-RUN yum --enablerepo=remi install -y ImageMagick7 ImageMagick7-devel && \
-    yum install -y gcc gcc-cpp gcc-c++ cpp make re2c icu libicu-devel && \
-    pecl channel-update pecl.php.net && \
-    pecl install imagick && \
-    echo "extension=imagick.so" >> /etc/php.ini && \
-    echo "pdo_mysql.default_socket=/var/run/mysqld/mysqld.sock" >> /etc/php.ini
+RUN   \
+   rm -f /var/log/apache2/* \
+   && rmdir /var/lock/apache2 \
+   && rmdir /var/run/apache2 \
+   && rmdir /var/log/apache2 \
+   && chmod 777 /var/log \
+   && chmod 777 /var/run \
+   && chmod 777 /var/lock \
+   && chmod 777 /bin/init_container.sh \
+   && cp /bin/apache2.conf /etc/apache2/apache2.conf \
+   && rm -rf /var/www/html \
+   && rm -rf /var/log/apache2 \
+   && mkdir -p /home/LogFiles \
+   && ln -s /home/site/wwwroot /var/www/html \
+   && ln -s /home/LogFiles /var/log/apache2
 
-# set up configure for redis
-RUN echo "extension=redis.so" >> /etc/php.ini
+
+RUN { \
+                echo 'opcache.memory_consumption=128'; \
+                echo 'opcache.interned_strings_buffer=8'; \
+                echo 'opcache.max_accelerated_files=4000'; \
+                echo 'opcache.revalidate_freq=60'; \
+                echo 'opcache.fast_shutdown=1'; \
+                echo 'opcache.enable_cli=1'; \
+    } > /usr/local/etc/php/conf.d/opcache-recommended.ini
+
+RUN { \
+                echo 'error_log=/var/log/apache2/php-error.log'; \
+                echo 'display_errors=Off'; \
+                echo 'log_errors=On'; \
+                echo 'display_startup_errors=Off'; \
+                echo 'date.timezone=UTC'; \
+    } > /usr/local/etc/php/conf.d/php.ini
 
 # install composer
 RUN curl -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/bin/composer
 
-EXPOSE 80
-CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+COPY sshd_config /etc/ssh/
+
+EXPOSE 2222 80
+
+ENV APACHE_RUN_USER www-data
+ENV PHP_VERSION 7.0.6
+
+ENV PORT 80
+ENV WEBSITE_ROLE_INSTANCE_ID localRoleInstance
+ENV WEBSITE_INSTANCE_ID localInstance
+ENV PATH ${PATH}:/home/site/wwwroot
+
+WORKDIR /var/www/html
+
+ENTRYPOINT ["/bin/init_container.sh"]
