@@ -2,9 +2,9 @@
 
 ## Env
 
-- CentOS
+- Ubuntu
 - Apache 2.4.6
-- PHP 7.1.8
+- PHP 7.0.6
 - MySQL 5.7
 - Redis 4.0.1 (latest)
 
