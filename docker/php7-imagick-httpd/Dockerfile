@@ -46,6 +46,13 @@ RUN apt-get update \
          pcntl \
     && docker-php-ext-enable imagick
 
+RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/3.1.2.tar.gz \
+    && mkdir -p /usr/src/php/ext \
+    && tar xfz /tmp/redis.tar.gz -C /tmp \
+    && rm -r /tmp/redis.tar.gz \
+    && mv /tmp/phpredis-3.1.2 /usr/src/php/ext/redis \
+    && docker-php-ext-install redis
+
 RUN   \
    rm -f /var/log/apache2/* \
    && rmdir /var/lock/apache2 \
